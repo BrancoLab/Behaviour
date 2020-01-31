@@ -1,3 +1,7 @@
+from tqdm import tqdm
+import cv2
+import numpy as np
+
 from fcutils.file_io.utils import check_file_exists
 from fcutils.video.utils import get_video_params, get_cap_from_file
 
@@ -9,9 +13,8 @@ def get_background_from_video(videopath, start_frame=0, avg_over=10):
         :param start_frame: int, frame to start at 
         :param avg_over: int, a frame every N is used for analysis to speed things up
     """
-    
-    if not check_file_exists(videopath):
-        raise FileExistsError('Could not find video at {}'.format(videopath))
+
+    check_file_exists(videopath, raise_error=True)
 
     # Open video and get params
     cap = get_cap_from_file(videopath)

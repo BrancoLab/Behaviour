@@ -32,7 +32,7 @@ class CommonCoordinates:
                 except Exception as e:
                     raise FileNotFoundError("Could not load arena from path  {}\n{}".format(arena_image, e))
             else:
-                self.arena = cv2.imread(arena_image)
+                self.arena = arena_image.copy()
                 if len(self.arena.shape) == 2: # make sure it's a RGB image
                     self.arena = np.repeat(self.arena[:, :, np.newaxis], 3, axis=2)
         else: 
@@ -51,8 +51,7 @@ class CommonCoordinates:
 
         # ---------------------------------- Set up ---------------------------------- #
         # Check video is good
-        if not check_file_exists(videopath):
-            raise ValueError("Video not found: "+videopath)
+        check_file_exists(videopath, raise_error=True)
 
         # Get output directory and save name and check if it exists
         if output_dir is None:
