@@ -48,3 +48,27 @@ def open_tdms(tdms_path, memmap_dir=False, as_dataframe=False):
         return tdms
 
 
+def get_tdms_groups(tdms):
+    """
+        Returns the groups in a tdms file
+
+        :param tdms: instance of TdmsFile
+    """
+    return tdms.groups()
+
+def get_tdms_group_channels(tdms, group)
+    """
+        Returns the channels that belong to a group in tdms file
+
+        :param tdms: instance of TdmsFile
+        :param group: string
+    """
+    groups = get_tdms_groups(tdms)
+    if group not in groups:
+        raise ValueError("Group not found!")
+
+    return tdms_df.group_channels(group)
+
+def get_tdms_channel_data(tdms, channel, num):
+    return tdms_df.channel_data(channel, str(num))
+
