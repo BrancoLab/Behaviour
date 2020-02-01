@@ -9,4 +9,4 @@ tqdm
 statsmodels
 nptdms
 opencv-python
-git+https://github.com/FedeClaudi/fcutils.git
+-e git+https://github.com/FedeClaudi/fcutils.git
