@@ -246,7 +246,7 @@ class FishEyeCalibration:
 # ---------------------------------------------------------------------------- #
 #                   OTHER USEFUL FUNCTIONS RELATED TO FISHEYE                  #
 # ---------------------------------------------------------------------------- #
-def correct_trackingdata_fisheye(inverse_fisheye_map_file, tracking, x_offset, y_offset):
+def correct_trackingdata_fisheye(tracking, inverse_fisheye_map_file, x_offset, y_offset):
     """
         Given a pd.DataFrame with 'x' and 'y' coordinates, and an inverted fish eye map,
         applies fisheye correction to coordinates.
@@ -258,6 +258,7 @@ def correct_trackingdata_fisheye(inverse_fisheye_map_file, tracking, x_offset, y
         :param y_offset: int if fish eye map was computed for the whole frame 
                                     but the tracking is from a video with samaller frame
     """
+
     check_file_exists(inverse_fisheye_map_file, raise_error=True)
     inverse_fisheye_maps = np.load(inverse_fisheye_map_file)
 

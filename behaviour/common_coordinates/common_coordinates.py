@@ -11,6 +11,33 @@ from fcutils.file_io.utils import check_file_exists, listdir
 
 from behaviour.utilities.video import get_background
 
+
+def register_tracking_data(unregistered, M, ypad, xpad):
+	"""[Corrects tracking data (as extracted by DLC) using a transform Matrix obtained via the CommonCoordinateBehaviour
+		toolbox. ]
+
+	Arguments:
+		unregistered {[np.ndarray]} -- [n-by-2 or n-by-3 array where n is number of frames and the columns have X,Y and Velocity ]
+		M {[np.ndarray]} -- [2-by-3 transformation matrix: https://github.com/BrancoLab/Common-Coordinate-Behaviour]
+
+	Returns:
+		registered {[np.ndarray]} -- [n-by-3 array with registered X,Y tracking and Velocity data]
+	"""     
+	# Prep vars
+	m3d = np.append(M, np.zeros((1,3)),0)
+	pads = np.vstack([[xpad, ypad] for i in range(len(unregistered))])
+	padded = np.add(unregistered, pads)
+	registered = np.zeros_like(unregistered)
+
+	# affine transform to match model arena
+	concat = np.ones((len(padded), 3))
+	concat[:, :2] = padded
+	registered = np.matmul(m3d, concat.T).T[:, :2]
+	return registered
+
+
+
+
 class CommonCoordinates:
     def __init__(self, arena_func=None, arena_image=None, points=None):
         """
