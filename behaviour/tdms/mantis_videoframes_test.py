@@ -5,7 +5,7 @@ import os
 
 from fcutils.file_io.utils import check_file_exists
 
-from utils import open_tdms, get_tdms_group_channels, get_video_params_from_metadata_tdms, get_analog_inputs_clean_dataframe
+from utils import open_tdms, get_tdms_group_channels, get_video_params_from_metadata_tdms, get_analog_inputs_clean_dataframe, get_analog_inputs_clean
 from behaviour.utilities.signals import get_frames_times_from_squarewave_signal
 
 
@@ -39,7 +39,7 @@ def inspect_metadata_file(metadata_tdms):
 
     # Get the expected file size
     expected_nbytes = (video_params['width'] * video_params['height']) * video_params['last']
-    return expected_nbytes
+    return expected_nbytes, video_params
 
 
 def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name, 
@@ -74,7 +74,7 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
         check_file_exists(f, raise_error=True)
 
     # Get expected n bytes
-    expected_nbytes = inspect_metadata_file(metadata_tdms)
+    expected_nbytes, video_params = inspect_metadata_file(metadata_tdms)
 
     # Check if size of video file is correct
     videofile_size = os.path.getsize(video_tdms)
@@ -92,23 +92,26 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
         print("File size as expected given {} frames. 0 frames lost!".format(video_params['last']))
 
     # --------------------- INSPECT N FRAMES IN ANALOG INPUT --------------------- #
-    if not skip_analog_inputs
+    if not skip_analog_inputs:
+        print("Opening analog inputs file, will take a while")
         # Load analog inputs
         inputs = get_analog_inputs_clean_dataframe(analog_inputs_tdms, is_opened=False)
-        n_frames = len(get_frames_times_from_squarewave_signal(inputs[camera_triggers_channel].values, debug=True))
+        n_frames = len(get_frames_times_from_squarewave_signal(inputs[camera_triggers_channel].values, debug=False))
 
         if n_frames != video_params['last']:
             raise ValueError("Number of frames in the frames AI ({}) is different than the expected number if frames ({})".format(n_frames, video_params['last']))
         else:
-            print("number of frames in the analog input is correct, no frames dropped.")
+            print("Number of frames in the analog input is correct, no frames dropped.")
     else:
         print("Skipping analysis of recorded camera triggers in analog input file.")
 
 
+#########################################################################
+
 if __name__ == "__main__":
-    experiment_folder = 'Z:\\swc\\branco\\rig_photometry\\Mantis_test\\test'
+    experiment_folder = 'Z:\\swc\\branco\\rig_photometry\\Mantis_test\\60fps'
     camera_name = 'FP_behav_camera'
     experiment_name='FP_just_behav'
     camera_triggers_channel='FP_behav_camera_triggers_reading'
 
-    check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name, camera_triggers_channel)
+    check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name, skip_analog_inputs=False, camera_triggers_channel=camera_triggers_channel)

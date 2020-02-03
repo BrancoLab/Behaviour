@@ -47,6 +47,16 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False):
     analog_inputs.columns = clean_columns
     return analog_inputs
 
+def get_analog_inputs_clean(analog_inputs, is_opened=False):
+    """
+        Returns a dictionary with data from mantis analog inputs file, after cleaning 
+        up the names of the channels. 
+
+        :param analog_inputs: instance of TdmsFile of path to a tdms analog_inputs file
+        :param is_opened: bool, if the path is passed, is_opened should be false so that the tdms file should be opened
+    """
+    if not is_opened:
+        analog_inputs = open_tdms(analog_inputs)
 
 # ---------------------------------------------------------------------------- #
 #                             GENERAL I/O FUNCTIONS                            #
