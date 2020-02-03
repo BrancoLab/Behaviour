@@ -5,6 +5,52 @@ from nptdms import TdmsFile
 
 from fcutils.file_io.utils import check_file_exists, check_create_folder
 
+
+# ---------------------------------------------------------------------------- #
+#                  UTILITY FUNCTIONS SPECIFIC FOR MANTIS FILES                 #
+# ---------------------------------------------------------------------------- #
+
+
+def get_video_params_from_metadata_tdms(metadata, is_opened=False):
+    """
+        Gets video params [fps, frame width and height and number of frames]
+        from a Mantis video metadata tdms file. 
+
+        :param metadata: instance of TdmsFile of path to a tdms metadata file
+        :param is_opened: bool, if the path is passed, is_opened should be false so that the tdms file should be opened
+    """
+    if not is_opened:
+        metadata = open_tdms(metadata)
+
+    return {n: v for n, v in metadata.object().properties.items()}
+
+
+def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False):
+    """
+        Returns a dataframe with data from mantis analog inputs file, after cleaning 
+        up the names of the channels. 
+
+        :param analog_inputs: instance of pd.DataFrame of path to a tdms analog_inputs file
+        :param is_opened: bool, if the path is passed, is_opened should be false so that the tdms file should be opened
+    """
+    if not is_opened:
+        analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
+    else:
+        if not isinstance(analog_inputs, pd.DataFrame):
+            raise ValueError(
+                "Opened analog inputs file should be passed as a dataframe"
+            )
+
+    clean_columns = [
+        c.strip("'0'").strip("'").strip("/").strip("'") for c in analog_inputs.columns
+    ]
+    analog_inputs.columns = clean_columns
+    return analog_inputs
+
+
+# ---------------------------------------------------------------------------- #
+#                             GENERAL I/O FUNCTIONS                            #
+# ---------------------------------------------------------------------------- #
 def tdms_as_dataframe(tdms, time_index=False, absolute_time=False):
     """
     Converts the TDMS file to a DataFrame
@@ -33,11 +79,11 @@ def open_tdms(tdms_path, memmap_dir=False, as_dataframe=False):
         :param as_dataframe: bool, if true a dataframe is returned
     """
     check_file_exists(tdms_path, raise_error=True)
-    if '.tdms' not in tdms_path:
-        raise ValueError("The file passed doesn't seem to be a TDMS: "+tdms_path)
+    if ".tdms" not in tdms_path:
+        raise ValueError("The file passed doesn't seem to be a TDMS: " + tdms_path)
 
-    if memmap_dir is None:
-        tdms =  TdmsFile(tdms_path)
+    if memmap_dir is None or not memmap_dir:
+        tdms = TdmsFile(tdms_path)
     else:
         check_create_folder(memmap_dir, raise_error=True)
         tdms = TdmsFile(tdms_path, memmap_dir=memmap_dir)
@@ -56,19 +102,21 @@ def get_tdms_groups(tdms):
     """
     return tdms.groups()
 
-def get_tdms_group_channels(tdms, group)
+
+def get_tdms_group_channels(tdms, group):
     """
         Returns the channels that belong to a group in tdms file
 
         :param tdms: instance of TdmsFile
-        :param group: string
+        :param group: string, name of the group whose channels you neeed
     """
     groups = get_tdms_groups(tdms)
     if group not in groups:
         raise ValueError("Group not found!")
 
-    return tdms_df.group_channels(group)
+    channels = tdms.group_channels(group)
+    return {ch.path.split("'/'")[-1][:-1]: ch for ch in channels}
+
 
 def get_tdms_channel_data(tdms, channel, num):
-    return tdms_df.channel_data(channel, str(num))
-
+    return tdms.channel_data(channel, str(num))

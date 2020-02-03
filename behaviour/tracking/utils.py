@@ -3,8 +3,12 @@ import numpy as np
 import os
 
 from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d
-from fcutils.maths.geometry import calc_angle_between_points_of_vector, calc_ang_velocity
+from fcutils.maths.geometry import (
+    calc_angle_between_points_of_vector,
+    calc_ang_velocity,
+)
 from fcutils.maths.geometry import calc_angle_between_vectors_of_points_2d
+
 
 def get_scorer_bodyparts(tracking):
     """
@@ -28,16 +32,19 @@ def clean_dlc_tracking(tracking):
     """
     scorer, bodyparts = get_scorer_bodyparts(tracking)
     return tracking[scorer], bodyparts
-    
+
 
 def get_speed_from_xy(xy):
     return calc_distance_between_points_in_a_vector_2d(xy)
 
+
 def get_dir_of_mvmt_from_xy(xy):
     return calc_angle_between_points_of_vector(xy)
 
+
 def get_orientation_from_two_xy(xy1, xy2):
     np.array(calc_angle_between_vectors_of_points_2d(xy1.T, xy1.T))
+
 
 def get_ang_vel_from_xy(xy=None, angles=None):
     if xy is not None:

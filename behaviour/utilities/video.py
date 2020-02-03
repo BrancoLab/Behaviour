@@ -5,6 +5,7 @@ import numpy as np
 from fcutils.file_io.utils import check_file_exists
 from fcutils.video.utils import get_video_params, get_cap_from_file
 
+
 def get_background_from_video(videopath, start_frame=0, avg_over=10):
     """
         Extracts background by averaging across video frames
@@ -19,7 +20,7 @@ def get_background_from_video(videopath, start_frame=0, avg_over=10):
     # Open video and get params
     cap = get_cap_from_file(videopath)
     nframes, width, height, fps = get_video_params(cap)
-    
+
     # Start at selected frame
     cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
 
@@ -37,10 +38,9 @@ def get_background_from_video(videopath, start_frame=0, avg_over=10):
             if ret:
                 # store the current frame in as a numpy array
                 background += frame[:, :, 0]
-                j+=1
+                j += 1
             else:
                 break
-
 
     background = (background / (j)).astype(np.uint8)
     cap.release()
