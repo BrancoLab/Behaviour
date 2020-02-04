@@ -91,7 +91,7 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
             print('Video file {} than expected size. Difference smaller than the size of one frame [{} bytes vs {}].\nSo no frames lost?'.format(s, videofile_size - expected_nbytes, frame_size))
         else:
             raise ValueError("Expected video file to have {} bytes, found {} instead".format(videofile_size, expected_nbytes))
-    else:
+    elif verbose:
         print("File size as expected given {} frames. 0 frames lost!".format(video_params['last']))
 
     # --------------------- INSPECT N FRAMES IN ANALOG INPUT --------------------- #
@@ -103,9 +103,9 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
 
         if n_frames != video_params['last']:
             raise ValueError("Number of frames in the frames AI ({}) is different than the expected number if frames ({})".format(n_frames, video_params['last']))
-        else:
+        elif verbose:
             print("Number of frames in the analog input is correct, no frames dropped.")
-    else:
+    elif verbose:
         print("Skipping analysis of recorded camera triggers in analog input file.")
     return True # if we get here evrything got well
 
