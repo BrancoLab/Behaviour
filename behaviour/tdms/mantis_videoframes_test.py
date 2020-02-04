@@ -13,25 +13,26 @@ from behaviour.utilities.signals import get_frames_times_from_squarewave_signal
 """
     Script to check the number of dropped frames in a mantis recording.
 """
-def inspect_metadata_file(metadata_tdms):
+def inspect_metadata_file(metadata_tdms, verbose):
     """
         It looks at what's inside a metadata tdms file and 
         it checks what the expected size of the video tdms file should be 
         given the # of frames and the frame size.
     """
     # Load metadata frame, get frame size and expected number of frames
-    print('\nLoading metadata')
     metadata = open_tdms(metadata_tdms)
     metadata_channels = get_tdms_group_channels(metadata, 'keys')
 
-    print('Found the following groups in metadata:')
-    [print("    {}".format(k)) for k in metadata_channels.keys()]
-
     # Get video params
     video_params = get_video_params_from_metadata_tdms(metadata, is_opened=True)
-    print('\nMetadata video parameters:')
-    [print("    {}:{}".format(k,v)) for k,v in video_params.items()]
-    print("\n\n")
+
+    if verbose:
+        print('Found the following groups in metadata:')
+        [print("    {}".format(k)) for k in metadata_channels.keys()]
+
+        print('\nMetadata video parameters:')
+        [print("    {}:{}".format(k,v)) for k,v in video_params.items()]
+        print("\n\n")
 
     # Check height match
     actual_height = metadata.as_dataframe()["/'keys'/'IMAQdxActualHeight'"][0]
@@ -45,7 +46,8 @@ def inspect_metadata_file(metadata_tdms):
 
 def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name, 
                         skip_analog_inputs=False,
-                        camera_triggers_channel=None):
+                        camera_triggers_channel=None, 
+                        verbose=False):
     """
         Checks if Mantis dropped any frames by:
             1) checking if the size of the video .tdms is what you'd expect given the number of frames and frame size
@@ -75,7 +77,7 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
         check_file_exists(f, raise_error=True)
 
     # Get expected n bytes
-    expected_nbytes, video_params = inspect_metadata_file(metadata_tdms)
+    expected_nbytes, video_params = inspect_metadata_file(metadata_tdms, verbose)
 
     # Check if size of video file is correct
     videofile_size = os.path.getsize(video_tdms)
