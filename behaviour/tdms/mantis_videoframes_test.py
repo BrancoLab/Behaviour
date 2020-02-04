@@ -5,7 +5,8 @@ import os
 
 from fcutils.file_io.utils import check_file_exists
 
-from utils import open_tdms, get_tdms_group_channels, get_video_params_from_metadata_tdms, get_analog_inputs_clean_dataframe, get_analog_inputs_clean
+from behaviour.tdms.utils import open_tdms, get_tdms_group_channels, get_video_params_from_metadata_tdms,
+from behaviour.tdms.utils import get_analog_inputs_clean_dataframe, get_analog_inputs_clean
 from behaviour.utilities.signals import get_frames_times_from_squarewave_signal
 
 
