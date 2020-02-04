@@ -61,8 +61,8 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
 
     # ---------- Check video tdms file has the expected number of bytes ---------- #
     # Get file paths and check they exist
-    video_tdms = os.path.join(experiment_folder, camera_name+'.tdms')
-    metadata_tdms = os.path.join(experiment_folder, camera_name+'meta.tdms')
+    video_tdms = os.path.join(experiment_folder, experiment_name+'(0)-'+camera_name+'.tdms')
+    metadata_tdms = os.path.join(experiment_folder, experiment_name+'(0)-'+camera_name+'meta.tdms')
 
     if not skip_analog_inputs:
         analog_inputs_tdms = os.path.join(experiment_folder, experiment_name+'(0).tdms')
@@ -78,7 +78,7 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
 
     # Check if size of video file is correct
     videofile_size = os.path.getsize(video_tdms)
-    if videofile_size != expected_nbytes:
+    if videofile_size != expected_nbytes+4096:
         frame_size = video_params['width'] * video_params['height']
         if abs(videofile_size - expected_nbytes) < frame_size:
             if videofile_size - expected_nbytes > 0:
@@ -104,12 +104,13 @@ def check_mantis_dropped_frames(experiment_folder, camera_name, experiment_name,
             print("Number of frames in the analog input is correct, no frames dropped.")
     else:
         print("Skipping analysis of recorded camera triggers in analog input file.")
+    return True # if we get here evrything got well
 
 
 #########################################################################
 
 if __name__ == "__main__":
-    experiment_folder = 'Z:\\swc\\branco\\rig_photometry\\Mantis_test\\60fps'
+    experiment_folder = r'Z:\swc\branco\Federico\Locomotion\raw\tosort\CA8493'
     camera_name = 'FP_behav_camera'
     experiment_name='FP_just_behav'
     camera_triggers_channel='FP_behav_camera_triggers_reading'
