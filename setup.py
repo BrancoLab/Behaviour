@@ -11,7 +11,8 @@ requirements = [
     "matplotlib",
     "vtk",
     "statsmodels",
-    "nptdms"
+    "nptdms",
+    "fancylog"
 
 ]
 
