@@ -38,7 +38,6 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     if not is_opened:
         df_path = analog_inputs.split(".")[0]+".hdf"
         if check_file_exists(df_path) and not overwrite:
-            print("Found an existing file, loading. ")
             return pd.read_hdf(df_path, key='hdf')        
         analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
 
