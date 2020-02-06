@@ -10,11 +10,11 @@ pip install git+https://github.com/BrancoLab/Behaviour.git
 
 Update with:
 ```
-pip install git+https://github.com/BrancoLab/Behaviour.git --update
+pip install git+https://github.com/BrancoLab/Behaviour.git --upgrade
 ```
 
 The function in this repository require [fc utils](https://github.com/FedeClaudi/fcutils), please 
 install/upgrade it with:
 ```
-pip install git+https://github.com/FedeClaudi/fcutils.git --update
+pip install git+https://github.com/FedeClaudi/fcutils.git --upgrade
 ```
