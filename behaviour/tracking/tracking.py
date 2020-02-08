@@ -29,7 +29,6 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
         :param common_coord: if true common coordinates referencing is done
         :param common_coord_args: arguments for common coordinates registration
         :param compute: if true speeds and angles are computed
-
     """
 
     # Load the tracking data
@@ -117,6 +116,6 @@ def compute_body_segments(tracking, segments):
 		# Get angular velocity
 		bone_angvel = np.array(get_ang_vel_from_xy(angles=bone_orientation))
 
-        # Find a way to put the results together somehow
-
+        # TODO Find a way to put the results together somehow
+        
 
