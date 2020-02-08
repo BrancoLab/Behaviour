@@ -91,19 +91,19 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 
 def compute_body_segments(tracking, segments):
-    """ 
-        Given a dataframe with tracking and a list of bones (body segments) it computes stuff on the bones
-        and returns the results as a dataframe
+	""" 
+		Given a dataframe with tracking and a list of bones (body segments) it computes stuff on the bones
+		and returns the results as a dataframe
 
-        :param tracking: hierarchical dataframe
-        :param segments: dict with keys as the names of the body segments and values as
-            tuples of bodyparts connected by the semgents
+		:param tracking: hierarchical dataframe
+		:param segments: dict with keys as the names of the body segments and values as
+			tuples of bodyparts connected by the semgents
 
-    """
-    raise NotImplementedError("Find a way to return it as a hierarchical DF like the tracking one")
+	"""
+	raise NotImplementedError("Find a way to return it as a hierarchical DF like the tracking one")
 
-    for bone, (bp1, bp2) in segments.items():
-        segment = {}
+	for bone, (bp1, bp2) in segments.items():
+		segment = {}
 		segkey['name'], segkey['bp1'], segkey['bp2'] = bone, bp1, bp2
 
 
@@ -117,5 +117,3 @@ def compute_body_segments(tracking, segments):
 		bone_angvel = np.array(get_ang_vel_from_xy(angles=bone_orientation))
 
         # TODO Find a way to put the results together somehow
-        
-

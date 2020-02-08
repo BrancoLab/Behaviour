@@ -1,6 +1,10 @@
-import matplotlib.pyplot as plt
+import numpy as np
 
-from fcutils.maths.stimuli_detection import find_peaks_in_signal
+def get_frames_times_from_squarewave_signal(squarewave_signal, th=4,):
+    if squarewave_signal[0]>th and squarewave_signal[1]>th:
+        squarewave_signal[0] = 0
+    derivative = np.concatenate([[0], np.diff(squarewave_signal)])
+    return np.where(derivative > th)[0]
 
 
 def get_frames_times_from_squarewave_signal(
@@ -15,7 +19,8 @@ def get_frames_times_from_squarewave_signal(
         plt.show()
     return frame_starts
 
-def get_times_signal_high_and_low(signal, th=1):
+def get_t
+imes_signal_high_and_low(signal, th=1):
     """
         Given a 1d time series it returns the times 
         (in # samples) in which the signal goes low->high (onset)

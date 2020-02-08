@@ -25,16 +25,22 @@ def get_video_params_from_metadata_tdms(metadata, is_opened=False):
     return {n: v for n, v in metadata.object().properties.items()}
 
 
-def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False):
+def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=False, save_df=True):
     """
         Returns a dataframe with data from mantis analog inputs file, after cleaning 
         up the names of the channels. 
 
         :param analog_inputs: instance of pd.DataFrame of path to a tdms analog_inputs file
+        :param overwrite: bool, if false it avoid overwriting a previously saved dataframe
         :param is_opened: bool, if the path is passed, is_opened should be false so that the tdms file should be opened
+        :param save_df: if True it will save the df to file to avoid loading everytime
     """
     if not is_opened:
+        df_path = analog_inputs.split(".")[0]+".hdf"
+        if check_file_exists(df_path) and not overwrite:
+            return pd.read_hdf(df_path, key='hdf')        
         analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
+
     else:
         if not isinstance(analog_inputs, pd.DataFrame):
             raise ValueError(
@@ -45,7 +51,12 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False):
         c.strip("'0'").strip("'").strip("/").strip("'") for c in analog_inputs.columns
     ]
     analog_inputs.columns = clean_columns
+    
+    if not is_opened and save_df:
+        analog_inputs.to_hdf(df_path, key="hdf")
+
     return analog_inputs
+
 
 def get_analog_inputs_clean(analog_inputs, is_opened=False):
     """
