@@ -57,8 +57,7 @@ def plot_tracking_2d_trace(tracking=None, x=None, y=None, ax=None,
 
 def plot_tracking_2d_heatmap(tracking=None, x=None, y=None, ax=None, 
                                 cmap='Reds', kind='hex',
-                                plot_kwargs={},
-                                fig_kwargs={}, ax_kwargs={}):
+                                plot_kwargs={}, ax_kwargs={}):
     """
         Plots a 2D heatmap from tracking data. 
 
@@ -71,7 +70,6 @@ def plot_tracking_2d_heatmap(tracking=None, x=None, y=None, ax=None,
         :param cmap: colormap used
         :param kind: str, type of 2d histogram, either hex or hist
         :param plot_kwargs: dict with extra arguments to personalise plot
-        :param fig_kwargs: dict with extra arguments to personalise figure
         :param ax_kwargs: dict with extra arguments to personalise ax
     """
     x,y = parse_tracking_args(tracking=tracking, x=x, y=y)

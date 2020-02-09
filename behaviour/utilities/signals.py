@@ -7,20 +7,7 @@ def get_frames_times_from_squarewave_signal(squarewave_signal, th=4,):
     return np.where(derivative > th)[0]
 
 
-def get_frames_times_from_squarewave_signal(
-    squarewave_signal, time_limit=10, th=4, debug=False
-):
-    frame_starts = find_peaks_in_signal(squarewave_signal, 10, 1, above=True)
-
-    if debug:
-        f, ax = plt.subplots()
-        ax.plot(squarewave_signal)
-        ax.scatter(frame_starts, [th for _ in frame_starts])
-        plt.show()
-    return frame_starts
-
-def get_t
-imes_signal_high_and_low(signal, th=1):
+def get_times_signal_high_and_low(signal, th=1):
     """
         Given a 1d time series it returns the times 
         (in # samples) in which the signal goes low->high (onset)
