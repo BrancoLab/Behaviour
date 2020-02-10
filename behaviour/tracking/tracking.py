@@ -109,7 +109,7 @@ def compute_body_segments(tracking, segments):
 
 
 		# get the XY tracking data
-		bp1, bp2 = tracking[bp1]['x', 'y'], tracking[bp2]['x', 'y'
+		bp1, bp2 = tracking[bp1]['x', 'y'], tracking[bp2]['x', 'y']
 
 		# get angle and ang vel 
 		bone_orientation = np.array(calc_angle_between_vectors_of_points_2d(bp1.T, bp2.T))
