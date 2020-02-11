@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import os
+import math
 
 from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d
 from fcutils.maths.geometry import (
@@ -41,8 +42,10 @@ def clean_dlc_tracking(tracking):
     return trackings, bodyparts
 
 
-def get_speed_from_xy(xy):
-    return calc_distance_between_points_in_a_vector_2d(xy)
+def get_speed_from_xy(x, y):
+    x_dot = np.abs(np.concatenate([0, np.diff(x)]))
+    y_dot = np.abs(np.concatenate([0, np.diff(y)]))
+    return math.sqrt(x_dot**2 + y_dot**2)
 
 
 def get_dir_of_mvmt_from_xy(xy):

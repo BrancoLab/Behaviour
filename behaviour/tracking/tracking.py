@@ -101,15 +101,12 @@ def compute_body_segments(tracking, segments):
                 names of the bodyparts that define each bone.
 
 	"""
-	raise NotImplementedError("Find a way to return it as a hierarchical DF like the tracking one")
 
+    bones = {}
 	for bone, (bp1, bp2) in segments.items():
-		segment = {}
-		segkey['name'], segkey['bp1'], segkey['bp2'] = bone, bp1, bp2
-
 
 		# get the XY tracking data
-		bp1, bp2 = tracking[bp1]['x', 'y'], tracking[bp2]['x', 'y']
+		bp1, bp2 = tracking[bp1][['x', 'y']].values, tracking[bp2][['x', 'y']].values
 
 		# get angle and ang vel 
 		bone_orientation = np.array(calc_angle_between_vectors_of_points_2d(bp1.T, bp2.T))
@@ -117,7 +114,14 @@ def compute_body_segments(tracking, segments):
 		# Get angular velocity
 		bone_angvel = np.array(get_ang_vel_from_xy(angles=bone_orientation))
 
-        # TODO Find a way to put the results together somehow
+        bones[bone] = pd.DataFrame(dict(
+                    orientation = bone_orientation, 
+                    angular_velocity = bone_angvel,
+                    ))
+    return bones
+
+
+        
 
 
 if __name__ == "__main__":
