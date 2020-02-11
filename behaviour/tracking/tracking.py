@@ -42,15 +42,15 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
     # Get likelihood and XY coords
     likelihoods = {}
     for bp in bodyparts:
-        likelihoods[bp] = tracking[bp].values[:, 2]
-        tracking[bp].drop('likelihood')
+        likelihoods[bp] = tracking[bp]['likelihood'].values
+        tracking[bp].drop('likelihood', axis=1)
 
     # Median filtering
     if median_filter:
         print("     applying median filter")
         for bp in bodyparts:
-            tracking[bp]['x'] = median_filter_1d(tracking[bp]['x'], **filter_kwargs)
-            tracking[bp]['y'] = median_filter_1d(tracking[bp]['y'], **filter_kwargs)
+            tracking[bp]['x'] = median_filter_1d(tracking[bp]['x'].values, **filter_kwargs)
+            tracking[bp]['y'] = median_filter_1d(tracking[bp]['y'].values, **filter_kwargs)
 
     # Fisheye correction
     if fisheye:
@@ -72,9 +72,6 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
         for bp in bodyparts:
             tracking[bp] = register_tracking_data(tracking[bp], *common_coord_args)
     
-    # Remove low likelihood frames
-    for bp, like in likelihoods.items():
-        tracking[bp][like < likelihood_th] = np.nan
 
     # Compute speed, angular velocity etc...
     if compute:
@@ -86,18 +83,22 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
             tracking[bp]['angular_velocity'] = get_ang_vel_from_xy(np.vstack([tracking[bp]['x'], tracking[bp]['y']]).T)
     
+    # Remove low likelihood frames
+    for bp, like in likelihoods.items():
+        tracking[bp][like < likelihood_th] = np.nan
+
     return tracking
 
 
 
 def compute_body_segments(tracking, segments):
 	""" 
-		Given a dataframe with tracking and a list of bones (body segments) it computes stuff on the bones
-		and returns the results as a dataframe
+		Given a dictionary of dataframes with tracking and a list of bones (body segments) it computes stuff on the bones
+		and returns the results
 
-		:param tracking: hierarchical dataframe
-		:param segments: dict with keys as the names of the body segments and values as
-			tuples of bodyparts connected by the semgents
+		:param tracking: dictionary of dataframes with tracking for each bodypart
+		:param segments: dict of two-tuples. Keys are the names of the bones and tuple elements the 
+                names of the bodyparts that define each bone.
 
 	"""
 	raise NotImplementedError("Find a way to return it as a hierarchical DF like the tracking one")
@@ -117,3 +118,13 @@ def compute_body_segments(tracking, segments):
 		bone_angvel = np.array(get_ang_vel_from_xy(angles=bone_orientation))
 
         # TODO Find a way to put the results together somehow
+
+
+if __name__ == "__main__":
+    tracking_filepath = r'Z:\swc\branco\Federico\Locomotion\raw\testracking.h5'
+
+    prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
+                        median_filter=True, filter_kwargs={},
+                        fisheye=False, fisheye_args=[],
+                        common_coord=False, common_coord_args=[],
+                        compute=True)

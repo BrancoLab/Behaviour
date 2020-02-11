@@ -9,7 +9,7 @@ import os
 from fcutils.file_io.utils import check_file_exists, listdir
 
 
-from behaviour.utilities.video import get_background
+from behaviour.utilities.video import get_background_from_video
 
 
 def register_tracking_data(unregistered, M, ypad, xpad):
@@ -147,14 +147,14 @@ class CommonCoordinates:
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
 
-    # perform projective transform and register background
-    M = cv2.estimateRigidTransform(background_data['clicked_points'], arena_data['points'], False)
-    registered_background = cv2.warpAffine(bg_copy, M, background.shape[::-1])
+        # perform projective transform and register background
+        M = cv2.estimateRigidTransform(background_data['clicked_points'], arena_data['points'], False)
+        registered_background = cv2.warpAffine(bg_copy, M, background.shape[::-1])
 
-    # Start user interaction to refine the matrix
-    M = self.get_mtrx_user_interaction()
+        # Start user interaction to refine the matrix
+        M = self.get_mtrx_user_interaction()
 
-    return M
+        return M
 
 
     # ---------------------------------------------------------------------------- #
@@ -182,7 +182,7 @@ class CommonCoordinates:
         print('  Crème de la crème: use \'tfgh\' to fine-tune shear\n')
         print('  y: save and use transform')
         print('  r: reset transform')
-        update_transform_data = dict(clicked_points=overlaid_arenas,background_data['clicked_points'], 
+        update_transform_data = dict(clicked_points=overlaid_arenas,  # background_data['clicked_points'], 
                         points=arena_data['points'], M=M, bg_copy=bg_copy)
 
         # create functions to react to additional clicked points
@@ -251,10 +251,10 @@ class CommonCoordinates:
                 overlaid_arenas = cv2.addWeighted(registered_background_color, alpha, arena_color, 1 - alpha, 0)
                 update_transform_data['points'] = overlaid_arenas
 
-    cv2.destroyAllWindows()
+        cv2.destroyAllWindows()
 
 
-    return M
+        return M
 
 
     # ---------------------------------------------------------------------------- #

@@ -14,8 +14,8 @@ from fcutils.file_io.utils import check_file_exists, check_create_folder, listdi
 """ 
 
 class FishEyeCalibration:
-    def __init__(self, calibration_images_folder, images_extention='.png', camera_name, 
-                checkerboard_shape, dark_threshold, 
+    def __init__(self, calibration_images_folder,  camera_name, 
+                checkerboard_shape, dark_threshold, images_extention='.png',
                 save_folder=None, save_inverted_map=True):
         """ 
             Initialise and run fish eye calibration
@@ -30,7 +30,7 @@ class FishEyeCalibration:
         """
         # ----------------------------------- setup ---------------------------------- #
         check_create_folder(calibration_images_folder, raise_error=True)
-        self.calibration_images = [f for listdir(calibration_images_folder) if images_extention in f]
+        self.calibration_images = [f for f in listdir(calibration_images_folder) if images_extention in f]
         print('Found ' + str(len(self.calibration_images)) + ' images for fisheye calibration.')
 
         if save_folder is None:
@@ -84,7 +84,7 @@ class FishEyeCalibration:
 
         # Loop over images
         for fn, fname in enumerate(self.calibration_images):
-            print("Processing image {} of {}".format(fn+1 len(self.calibration_images)))
+            print("Processing image {} of {}".format(fn+1, len(self.calibration_images)))
             img = cv2.imread(fname)
             if _img_shape == None:
                 _img_shape = img.shape[:2]
@@ -173,10 +173,10 @@ class FishEyeCalibration:
 
             cv2.imshow("correction -- before and after", img)
             if cv2.waitKey(1000) & 0xFF == ord('q'):
-            break 
+                break 
             cv2.imshow("correction -- before and after", undistorted_img)
             if cv2.waitKey(1000) & 0xFF == ord('q'):
-            break 
+                break 
         
         # make map
         maps = np.zeros((calib_image.shape[0],calib_image.shape[1],3)).astype(np.int16)
