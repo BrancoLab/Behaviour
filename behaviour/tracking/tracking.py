@@ -6,6 +6,7 @@ from fcutils.maths.filtering import median_filter_1d
 
 from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d as get_speed_from_xy
 from fcutils.maths.geometry import calc_angle_between_points_of_vector_2d as get_dir_of_mvmt_from_xy
+from fcutils.maths.geometry import calc_angle_between_vectors_of_points_2d as get_bone_angle
 from fcutils.maths.geometry import calc_ang_velocity
 from fcutils.maths.utils import derivative
 
@@ -109,37 +110,23 @@ def compute_body_segments(tracking, segments):
 				names of the bodyparts that define each bone.
 
 	"""
+	print("Processing body segments")
 
 	bones = {}
 	for bone, (bp1, bp2) in segments.items():
 
 		# get the XY tracking data
-		bp1, bp2 = tracking[bp1][['x', 'y']].values, tracking[bp2][['x', 'y']].values
+		bp1, bp2 = tracking[bp1], tracking[bp2]
 
 		# get angle and ang vel 
-		bone_orientation = np.array(calc_angle_between_vectors_of_points_2d(bp1.T, bp2.T))
+		bone_orientation = get_bone_angle(bp1.x.values, bp1.y.values,
+										bp2.x.values, bp2.y.values,)
 
 		# Get angular velocity
-		bone_angvel = np.array(get_ang_vel_from_xy(angles=bone_orientation))
+		bone_angvel = np.array(calc_ang_velocity(bone_orientation))
 
 		bones[bone] = pd.DataFrame(dict(
 					orientation = bone_orientation, 
 					angular_velocity = bone_angvel,
 					))
 	return bones
-
-
-		
-
-
-if __name__ == "__main__":
-	tracking_filepath = r'Z:\swc\branco\Federico\Locomotion\raw\testracking.h5'
-
-	tracking = prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
-						median_filter=True, filter_kwargs={},
-						fisheye=False, fisheye_args=[],
-						common_coord=False, common_coord_args=[],
-						compute=True)
-
-	skeleton = dict(head=('snout', 'neck'), body=('neck', 'body'))
-	bones = compute_body_segments(tracking, skeleton)
