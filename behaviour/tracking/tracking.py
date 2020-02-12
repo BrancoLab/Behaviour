@@ -4,90 +4,98 @@ import pandas as pd
 from fcutils.file_io.utils import check_file_exists
 from fcutils.maths.filtering import median_filter_1d
 
-from utils import clean_dlc_tracking, get_speed_from_xy, get_dir_of_mvmt_from_xy, get_ang_vel_from_xy
+from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d as get_speed_from_xy
+from fcutils.maths.geometry import calc_angle_between_points_of_vector_2d as get_dir_of_mvmt_from_xy
+from fcutils.maths.geometry import calc_ang_velocity
+from fcutils.maths.utils import derivative
+
+
+from utils import clean_dlc_tracking
 from behaviour.common_coordinates.fisheye import correct_trackingdata_fisheye
 from behaviour.common_coordinates.common_coordinates import register_tracking_data
 
 
 
 def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
-                        median_filter=False, filter_kwargs={},
-                        fisheye=False, fisheye_args=[],
-                        common_coord=False, common_coord_args=[],
-                        compute=True):
-    """
-        Loads, cleans and filters tracking data from dlc.
-        Also handles fisheye correction and registration to common coordinates frame.
-        Can be used to compute speeds and angles for each bp.
+						median_filter=False, filter_kwargs={},
+						fisheye=False, fisheye_args=[],
+						common_coord=False, common_coord_args=[],
+						compute=True):
+	"""
+		Loads, cleans and filters tracking data from dlc.
+		Also handles fisheye correction and registration to common coordinates frame.
+		Can be used to compute speeds and angles for each bp.
 
-        :param tracking_filepath: path to file to process
-        :param likelihood_th: float, frames with likelihood < thresh are nanned
-        :param median_filter: if true the data are filtered before the processing
-        :param filter_kwargs: arguments for median filtering func
-        :param fisheye: if true fish eye correction is applied
-        :param fisheye_args: arguments for fisheye correction func
-        :param common_coord: if true common coordinates referencing is done
-        :param common_coord_args: arguments for common coordinates registration
-        :param compute: if true speeds and angles are computed
-    """
+		:param tracking_filepath: path to file to process
+		:param likelihood_th: float, frames with likelihood < thresh are nanned
+		:param median_filter: if true the data are filtered before the processing
+		:param filter_kwargs: arguments for median filtering func
+		:param fisheye: if true fish eye correction is applied
+		:param fisheye_args: arguments for fisheye correction func
+		:param common_coord: if true common coordinates referencing is done
+		:param common_coord_args: arguments for common coordinates registration
+		:param compute: if true speeds and angles are computed
+	"""
 
-    # Load the tracking data
-    check_file_exists(tracking_filepath, raise_error=True)
-    if '.h5' not in tracking_filepath:
-        raise ValueError("Expected .h5 in the tracking data file path")
-    
-    print('Processing: {}'.format(tracking_filepath))
-    tracking, bodyparts = clean_dlc_tracking(pd.read_hdf(tracking_filepath))
+	# Load the tracking data
+	check_file_exists(tracking_filepath, raise_error=True)
+	if '.h5' not in tracking_filepath:
+		raise ValueError("Expected .h5 in the tracking data file path")
+	
+	print('Processing: {}'.format(tracking_filepath))
+	tracking, bodyparts = clean_dlc_tracking(pd.read_hdf(tracking_filepath))
 
-    # Get likelihood and XY coords
-    likelihoods = {}
-    for bp in bodyparts:
-        likelihoods[bp] = tracking[bp]['likelihood'].values
-        tracking[bp].drop('likelihood', axis=1)
+	# Get likelihood and XY coords
+	likelihoods = {}
+	for bp in bodyparts:
+		likelihoods[bp] = tracking[bp]['likelihood'].values
+		tracking[bp].drop('likelihood', axis=1)
 
-    # Median filtering
-    if median_filter:
-        print("     applying median filter")
-        for bp in bodyparts:
-            tracking[bp]['x'] = median_filter_1d(tracking[bp]['x'].values, **filter_kwargs)
-            tracking[bp]['y'] = median_filter_1d(tracking[bp]['y'].values, **filter_kwargs)
+	# Median filtering
+	if median_filter:
+		print("     applying median filter")
+		for bp in bodyparts:
+			tracking[bp]['x'] = median_filter_1d(tracking[bp]['x'].values, **filter_kwargs)
+			tracking[bp]['y'] = median_filter_1d(tracking[bp]['y'].values, **filter_kwargs)
 
-    # Fisheye correction
-    if fisheye:
-        print("     applying fisheye correction")
-        if len(fisheye_args) != 3:
-            raise ValueError("fish eye correction requires 3 arguments \
-                        but {} were pased".format(len(fisheye_args)))
+	# Fisheye correction
+	if fisheye:
+		print("     applying fisheye correction")
+		if len(fisheye_args) != 3:
+			raise ValueError("fish eye correction requires 3 arguments \
+						but {} were pased".format(len(fisheye_args)))
 
-        for bp in bodyparts:
-            tracking[bp] = correct_trackingdata_fisheye(tracking[bp], *fisheye_args)
+		for bp in bodyparts:
+			tracking[bp] = correct_trackingdata_fisheye(tracking[bp], *fisheye_args)
 
-    # Reference frame registration
-    if common_coord:
-        print("     registering to reference space")
-        if len(common_coord_args) != 3:
-            raise ValueError("reference frame registation requires 3 arguments \
-                but {} were passed".format(len(common_coord_args)))
-         
-        for bp in bodyparts:
-            tracking[bp] = register_tracking_data(tracking[bp], *common_coord_args)
-    
+	# Reference frame registration
+	if common_coord:
+		print("     registering to reference space")
+		if len(common_coord_args) != 3:
+			raise ValueError("reference frame registation requires 3 arguments \
+				but {} were passed".format(len(common_coord_args)))
+		 
+		for bp in bodyparts:
+			tracking[bp] = register_tracking_data(tracking[bp], *common_coord_args)
+	
 
-    # Compute speed, angular velocity etc...
-    if compute:
-        print("     computing speeds and angles")
-        for bp in bodyparts:
-            tracking[bp]['speed'] = get_speed_from_xy(tracking[bp].values[:, :2])
+	# Compute speed, angular velocity etc...
+	if compute:
+		print("     computing speeds and angles")
+		for bp in bodyparts:
+			x, y = tracking[bp].x.values, tracking[bp].y.values
 
-            tracking[bp]['direction_of_movement'] = get_dir_of_mvmt_from_xy(np.vstack([tracking[bp]['x'], tracking[bp]['y']]).T)
+			tracking[bp]['speed'] = get_speed_from_xy(x, y)
 
-            tracking[bp]['angular_velocity'] = get_ang_vel_from_xy(np.vstack([tracking[bp]['x'], tracking[bp]['y']]).T)
-    
-    # Remove low likelihood frames
-    for bp, like in likelihoods.items():
-        tracking[bp][like < likelihood_th] = np.nan
+			tracking[bp]['direction_of_movement'] = get_dir_of_mvmt_from_xy(x, y)
 
-    return tracking
+			tracking[bp]['angular_velocity'] = calc_ang_velocity(tracking[bp]['direction_of_movement'].values)
+	
+	# Remove low likelihood frames
+	for bp, like in likelihoods.items():
+		tracking[bp][like < likelihood_th] = np.nan
+
+	return tracking
 
 
 
@@ -98,11 +106,11 @@ def compute_body_segments(tracking, segments):
 
 		:param tracking: dictionary of dataframes with tracking for each bodypart
 		:param segments: dict of two-tuples. Keys are the names of the bones and tuple elements the 
-                names of the bodyparts that define each bone.
+				names of the bodyparts that define each bone.
 
 	"""
 
-    bones = {}
+	bones = {}
 	for bone, (bp1, bp2) in segments.items():
 
 		# get the XY tracking data
@@ -114,21 +122,24 @@ def compute_body_segments(tracking, segments):
 		# Get angular velocity
 		bone_angvel = np.array(get_ang_vel_from_xy(angles=bone_orientation))
 
-        bones[bone] = pd.DataFrame(dict(
-                    orientation = bone_orientation, 
-                    angular_velocity = bone_angvel,
-                    ))
-    return bones
+		bones[bone] = pd.DataFrame(dict(
+					orientation = bone_orientation, 
+					angular_velocity = bone_angvel,
+					))
+	return bones
 
 
-        
+		
 
 
 if __name__ == "__main__":
-    tracking_filepath = r'Z:\swc\branco\Federico\Locomotion\raw\testracking.h5'
+	tracking_filepath = r'Z:\swc\branco\Federico\Locomotion\raw\testracking.h5'
 
-    prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
-                        median_filter=True, filter_kwargs={},
-                        fisheye=False, fisheye_args=[],
-                        common_coord=False, common_coord_args=[],
-                        compute=True)
+	tracking = prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
+						median_filter=True, filter_kwargs={},
+						fisheye=False, fisheye_args=[],
+						common_coord=False, common_coord_args=[],
+						compute=True)
+
+	skeleton = dict(head=('snout', 'neck'), body=('neck', 'body'))
+	bones = compute_body_segments(tracking, skeleton)

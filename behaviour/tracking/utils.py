@@ -1,14 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import math
-
-from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d
-from fcutils.maths.geometry import (
-    calc_angle_between_points_of_vector,
-    calc_ang_velocity,
-)
-from fcutils.maths.geometry import calc_angle_between_vectors_of_points_2d
 
 
 def get_scorer_bodyparts(tracking):
@@ -41,25 +33,3 @@ def clean_dlc_tracking(tracking):
 
     return trackings, bodyparts
 
-
-def get_speed_from_xy(x, y):
-    x_dot = np.abs(np.concatenate([0, np.diff(x)]))
-    y_dot = np.abs(np.concatenate([0, np.diff(y)]))
-    return math.sqrt(x_dot**2 + y_dot**2)
-
-
-def get_dir_of_mvmt_from_xy(xy):
-    return calc_angle_between_points_of_vector(xy)
-
-
-def get_orientation_from_two_xy(xy1, xy2):
-    np.array(calc_angle_between_vectors_of_points_2d(xy1.T, xy1.T))
-
-
-def get_ang_vel_from_xy(xy=None, angles=None):
-    if xy is not None:
-        return calc_ang_velocity(get_dir_of_mvmt_from_xy(xy))
-    elif angles is not None:
-        return calc_ang_velocity(angles)
-    else:
-        raise ValueError("No data passed!")
