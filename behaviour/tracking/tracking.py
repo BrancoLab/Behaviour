@@ -11,7 +11,7 @@ from fcutils.maths.geometry import calc_ang_velocity
 from fcutils.maths.utils import derivative
 
 
-from utils import clean_dlc_tracking
+from behaviour.tracking.utils import clean_dlc_tracking
 from behaviour.common_coordinates.fisheye import correct_trackingdata_fisheye
 from behaviour.common_coordinates.common_coordinates import register_tracking_data
 
