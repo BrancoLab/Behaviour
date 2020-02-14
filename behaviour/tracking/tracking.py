@@ -9,7 +9,7 @@ from fcutils.maths.geometry import calc_angle_between_points_of_vector_2d as get
 from fcutils.maths.geometry import calc_angle_between_vectors_of_points_2d as get_bone_angle
 from fcutils.maths.geometry import calc_ang_velocity
 from fcutils.maths.utils import derivative
-
+from fcutils.maths.filtering import median_filter_1d
 
 from behaviour.tracking.utils import clean_dlc_tracking
 from behaviour.common_coordinates.fisheye import correct_trackingdata_fisheye
@@ -21,7 +21,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 						median_filter=False, filter_kwargs={},
 						fisheye=False, fisheye_args=[],
 						common_coord=False, common_coord_args=[],
-						compute=True):
+						compute=True, smooth_dir_mvmt=True):
 	"""
 		Loads, cleans and filters tracking data from dlc.
 		Also handles fisheye correction and registration to common coordinates frame.
@@ -36,6 +36,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 		:param common_coord: if true common coordinates referencing is done
 		:param common_coord_args: arguments for common coordinates registration
 		:param compute: if true speeds and angles are computed
+		:param smooth_dir_mvmt: if true the direction of mvmt is smoothed with a median filt.
 	"""
 
 	# Load the tracking data
@@ -88,7 +89,10 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 			tracking[bp]['speed'] = get_speed_from_xy(x, y)
 
-			tracking[bp]['direction_of_movement'] = get_dir_of_mvmt_from_xy(x, y)
+			if not smooth_dir_mvmt:
+				tracking[bp]['direction_of_movement'] = get_dir_of_mvmt_from_xy(x, y)	
+			else:
+				tracking[bp]['direction_of_movement'] = median_filter_1d(get_dir_of_mvmt_from_xy(x, y), kernel=41)	
 
 			tracking[bp]['angular_velocity'] = calc_ang_velocity(tracking[bp]['direction_of_movement'].values)
 	
@@ -100,7 +104,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 
 
-def compute_body_segments(tracking, segments):
+def compute_body_segments(tracking, segments, smooth_orientation=True):
 	""" 
 		Given a dictionary of dataframes with tracking and a list of bones (body segments) it computes stuff on the bones
 		and returns the results
@@ -108,6 +112,7 @@ def compute_body_segments(tracking, segments):
 		:param tracking: dictionary of dataframes with tracking for each bodypart
 		:param segments: dict of two-tuples. Keys are the names of the bones and tuple elements the 
 				names of the bodyparts that define each bone.
+		:param smooth_orientation: bool, if true the bone angles are smoothed with a median filter
 
 	"""
 	print("Processing body segments")
@@ -119,8 +124,12 @@ def compute_body_segments(tracking, segments):
 		bp1, bp2 = tracking[bp1], tracking[bp2]
 
 		# get angle and ang vel 
-		bone_orientation = get_bone_angle(bp1.x.values, bp1.y.values,
-										bp2.x.values, bp2.y.values,)
+		if not smooth_orientation:
+			bone_orientation = get_bone_angle(bp1.x.values, bp1.y.values,
+											bp2.x.values, bp2.y.values,)
+		else:
+			bone_orientation = median_filter_1d(get_bone_angle(bp1.x.values, bp1.y.values,
+											bp2.x.values, bp2.y.values,), kernel=41)	
 
 		# Get angular velocity
 		bone_angvel = np.array(calc_ang_velocity(bone_orientation))
