@@ -53,6 +53,26 @@ def plot_tracking_2d_trace(tracking=None, x=None, y=None, ax=None,
     ax.plot(x, y, **line_kwargs)
     return ax
 
+def plot_tracking_2d_scatter(tracking=None, x=None, y=None, ax=None, 
+                                scatter_kwargs={},  ax_kwargs={}):
+    """
+        Plots 2D tracking data as a scatter plot of X,Y coordinates
+
+        :param tracking: mxN or Nxm np.ndarray with X,Y for each frame.
+                Assumes that X and Y are the first two rows/columns in the 
+                dimension with the fewest emelements.
+        :param x: 1d np.ndarray or list with x coordintes
+        :param y: 1d np.ndarray or list with y coordintes
+        :param ax: matplotlib ax, if not passed a figure created
+        :param scatter_kwargs: dict with arguments for scatter, can be used to pass a variable to color the scatter plot
+                [with the argument 'c'] and a colormap [with argument 'cmap']
+        :param ax_kwargs: dict with extra arguments to personalise ax
+    """
+    x,y = parse_tracking_args(tracking=tracking, x=x, y=y)
+    ax = parse_figure_args(ax=ax, **ax_kwargs)
+
+    ax.scatter(x, y, **scatter_kwargs)
+    return ax
 
 
 def plot_tracking_2d_heatmap(tracking=None, x=None, y=None, ax=None, 
