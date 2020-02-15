@@ -12,7 +12,8 @@ requirements = [
     "vtk",
     "statsmodels",
     "nptdms",
-    "fancylog"
+    "fancylog",
+    "termcolor"
 
 ]
 
