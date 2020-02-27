@@ -20,7 +20,7 @@ from behaviour.common_coordinates.common_coordinates import register_tracking_da
 def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 						median_filter=False, filter_kwargs={},
 						fisheye=False, fisheye_args=[],
-						common_coord=False, common_coord_args=[],
+						common_coord=False, ccm_mtx=None,
 						compute=True, smooth_dir_mvmt=True):
 	"""
 		Loads, cleans and filters tracking data from dlc.
@@ -34,7 +34,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 		:param fisheye: if true fish eye correction is applied
 		:param fisheye_args: arguments for fisheye correction func
 		:param common_coord: if true common coordinates referencing is done
-		:param common_coord_args: arguments for common coordinates registration
+		:param ccm_mtx: np.array with matrix for common coordinates registration
 		:param compute: if true speeds and angles are computed
 		:param smooth_dir_mvmt: if true the direction of mvmt is smoothed with a median filt.
 	"""
@@ -79,8 +79,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 				but {} were passed".format(len(common_coord_args)))
 		 
 		for bp in bodyparts:
-			tracking[bp]['x'] = register_tracking_data(tracking[bp]['x'], *common_coord_args)[:, 0]
-			tracking[bp]['y'] = register_tracking_data(tracking[bp]['y'], *common_coord_args)[:, 1]
+			tracking[bp]['x'] = register_tracking_data(tracking[bp]['x'], ccm_mtx)[:, 0]
+			tracking[bp]['y'] = register_tracking_data(tracking[bp]['y'], ccm_mtx)[:, 1]
 
 
 	# Compute speed, angular velocity etc...
