@@ -74,7 +74,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	# Reference frame registration
 	if common_coord:
 		print("     registering to reference space")
-		if ccm_mtxis None:
+		if ccm_mtx is None:
 			raise ValueError("ccm_mtx cannot be None")
 		 
 		for bp in bodyparts:
