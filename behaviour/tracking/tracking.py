@@ -79,8 +79,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 				but {} were passed".format(len(common_coord_args)))
 		 
 		for bp in bodyparts:
-			tracking[bp]['x'] = register_tracking_data(tracking[bp]['x'], *common_coord_args)
-			tracking[bp]['y'] = register_tracking_data(tracking[bp]['y'], *common_coord_args)
+			tracking[bp]['x'] = register_tracking_data(tracking[bp]['x'], *common_coord_args)[:, 0]
+			tracking[bp]['y'] = register_tracking_data(tracking[bp]['y'], *common_coord_args)[:, 1]
 
 
 	# Compute speed, angular velocity etc...
