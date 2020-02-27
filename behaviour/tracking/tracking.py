@@ -78,8 +78,10 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 			raise ValueError("ccm_mtx cannot be None")
 		 
 		for bp in bodyparts:
-			tracking[bp]['x'] = register_tracking_data(tracking[bp]['x'].values, ccm_mtx)[:, 1]
-			tracking[bp]['y'] = register_tracking_data(tracking[bp]['y'].values, ccm_mtx)[:, 0]
+			xy = np.vstack([tracking[bp]['x'].values, tracking[bp]['y'].values]).T
+			corrected_xy = register_tracking_data(xy, ccm_mtx)
+			tracking[bp]['x'] = corrected_xy[:, 0]
+			tracking[bp]['y'] = corrected_xy[:, 1]
 
 
 	# Compute speed, angular velocity etc...

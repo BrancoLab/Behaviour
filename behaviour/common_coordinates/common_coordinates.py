@@ -25,12 +25,9 @@ def register_tracking_data(unregistered, M):
     """     
     # Prep vars
     m3d = np.append(M, np.zeros((1,3)),0)
-
-    n_samples = unregistered.shape[0]
-    unregistered = np.repeat(unregistered, 2).reshape(n_samples, 2)
-    registered = np.zeros_like(unregistered)
-
+    
     # affine transform to match model arena
+    registered = np.zeros_like(unregistered)
     concat = np.ones((len(unregistered), 3))
     concat[:, :2] = unregistered
     registered = np.matmul(m3d, concat.T).T[:, :2]
