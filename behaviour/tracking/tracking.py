@@ -62,6 +62,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 	# Fisheye correction
 	if fisheye:
+		raise NotImplementedError
 		print("     applying fisheye correction")
 		if len(fisheye_args) != 3:
 			raise ValueError("fish eye correction requires 3 arguments \
@@ -78,8 +79,9 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 				but {} were passed".format(len(common_coord_args)))
 		 
 		for bp in bodyparts:
-			tracking[bp] = register_tracking_data(tracking[bp], *common_coord_args)
-	
+			tracking[bp]['x'] = register_tracking_data(tracking[bp]['x'], *common_coord_args)
+			tracking[bp]['y'] = register_tracking_data(tracking[bp]['y'], *common_coord_args)
+
 
 	# Compute speed, angular velocity etc...
 	if compute:
