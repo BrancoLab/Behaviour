@@ -53,7 +53,7 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     analog_inputs.columns = clean_columns
     
     if not is_opened and save_df:
-        analog_inputs.astype('float64').to_hdf(df_path, key="hdf")
+        analog_inputs.to_hdf(df_path, key="hdf")
 
     return analog_inputs
 
