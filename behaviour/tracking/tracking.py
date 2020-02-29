@@ -20,7 +20,7 @@ from behaviour.common_coordinates.common_coordinates import register_tracking_da
 def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 						median_filter=False, filter_kwargs={},
 						fisheye=False, fisheye_args=[],
-						common_coord=False, common_coord_args=[],
+						common_coord=False, ccm_mtx=None,
 						compute=True, smooth_dir_mvmt=True):
 	"""
 		Loads, cleans and filters tracking data from dlc.
@@ -34,7 +34,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 		:param fisheye: if true fish eye correction is applied
 		:param fisheye_args: arguments for fisheye correction func
 		:param common_coord: if true common coordinates referencing is done
-		:param common_coord_args: arguments for common coordinates registration
+		:param ccm_mtx: np.array with matrix for common coordinates registration
 		:param compute: if true speeds and angles are computed
 		:param smooth_dir_mvmt: if true the direction of mvmt is smoothed with a median filt.
 	"""
@@ -62,6 +62,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 	# Fisheye correction
 	if fisheye:
+		raise NotImplementedError
 		print("     applying fisheye correction")
 		if len(fisheye_args) != 3:
 			raise ValueError("fish eye correction requires 3 arguments \
@@ -73,13 +74,15 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	# Reference frame registration
 	if common_coord:
 		print("     registering to reference space")
-		if len(common_coord_args) != 3:
-			raise ValueError("reference frame registation requires 3 arguments \
-				but {} were passed".format(len(common_coord_args)))
+		if ccm_mtx is None:
+			raise ValueError("ccm_mtx cannot be None")
 		 
 		for bp in bodyparts:
-			tracking[bp] = register_tracking_data(tracking[bp], *common_coord_args)
-	
+			xy = np.vstack([tracking[bp]['x'].values, tracking[bp]['y'].values]).T
+			corrected_xy = register_tracking_data(xy, ccm_mtx)
+			tracking[bp]['x'] = corrected_xy[:, 0]
+			tracking[bp]['y'] = corrected_xy[:, 1]
+
 
 	# Compute speed, angular velocity etc...
 	if compute:

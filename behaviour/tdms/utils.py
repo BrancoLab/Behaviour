@@ -36,7 +36,7 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
         :param save_df: if True it will save the df to file to avoid loading everytime
     """
     if not is_opened:
-        df_path = analog_inputs.split(".")[0]+".hdf"
+        df_path = analog_inputs.split(".")[0]+".h5"
         if check_file_exists(df_path) and not overwrite:
             return pd.read_hdf(df_path, key='hdf')        
         analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
