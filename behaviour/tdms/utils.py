@@ -53,7 +53,10 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     analog_inputs.columns = clean_columns
     
     if not is_opened and save_df:
-        analog_inputs.to_hdf(df_path, key="hdf")
+        try:
+            analog_inputs.to_hdf(df_path, key="hdf")
+        except Exception as e:
+            print(f"Could not save tdms to .h5 becauseof error: \n{e}")
 
     return analog_inputs
 
