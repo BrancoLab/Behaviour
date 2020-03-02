@@ -1,6 +1,11 @@
 
+"""
+    !!! THIS CODE WAS COPIED OVER FROM ANOTHER REPO BUT HAS NOT BEEN ADAPTED TO WORK HERE
+"""
 
-def extract_behaviour_stimuli(, aifile):
+
+
+def extract_behaviour_stimuli(aifile):
     """extract_behaviour_stimuli [given the path to a .tdms file with session metadata extract
     stim names and timestamp (in frames)]
     
@@ -27,7 +32,7 @@ def extract_behaviour_stimuli(, aifile):
         stimuli.append(stim(stim_type, stim_name, stim_frame))
     return stimuli
 
-def extract_ai_info(, key, aifile):
+def extract_ai_info(key, aifile):
     """
     aifile: str path to ai.tdms
 

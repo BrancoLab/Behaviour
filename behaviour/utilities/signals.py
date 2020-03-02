@@ -1,5 +1,17 @@
 import numpy as np
 
+
+def convert_from_sample_to_frame(sample_n, sampling_rate, fps):
+    '''
+        Given the time at which an event occurred in # samples, get the 
+        corresponding frame number assuming that the sampling rate and the frame
+        rate of the recording are different but recording of both
+        samples and frames started at the same time.
+    '''
+
+    return np.round(np.multiply(np.divide(sample_n, sampling_rate), fps))
+
+
 def get_frames_times_from_squarewave_signal(squarewave_signal, th=4,):
     if squarewave_signal[0]>th and squarewave_signal[1]>th:
         squarewave_signal[0] = 0
