@@ -3,7 +3,7 @@
     !!! THIS CODE WAS COPIED OVER FROM ANOTHER REPO BUT HAS NOT BEEN ADAPTED TO WORK HERE
 """
 
-
+raise NotImplementedError
 
 def extract_behaviour_stimuli(aifile):
     """extract_behaviour_stimuli [given the path to a .tdms file with session metadata extract
