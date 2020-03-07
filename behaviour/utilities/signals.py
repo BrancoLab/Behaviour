@@ -35,7 +35,7 @@ def get_times_signal_high_and_low(signal, th=1, min_time_between_highs=None):
 
     signal_onset = np.where(np.diff(signal_copy) > .5)
     
-    if not len(signal_onset):
+    if not len(signal_onset[0]):
         return [], []
     signal_onset = signal_onset[0]
     if min_time_between_highs is not None:
@@ -44,7 +44,7 @@ def get_times_signal_high_and_low(signal, th=1, min_time_between_highs=None):
 
 
     signal_offset = np.where(np.diff(signal_copy) < -.5)
-    if not len(signal_offset):
+    if not len(signal_offset[0]):
         return [], []
     signal_offset = signal_offset[0]
     if min_time_between_highs is not None:

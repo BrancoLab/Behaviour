@@ -38,7 +38,11 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     if not is_opened:
         df_path = analog_inputs.split(".")[0]+".h5"
         if check_file_exists(df_path) and not overwrite:
-            return pd.read_hdf(df_path, key='hdf')        
+            try:
+                return pd.read_hdf(df_path, key='hdf')        
+            except:
+                if verbose:
+                    print("Failed to open .h5 file, trying to open as tdms instead")
         if verbose:
             print("Opening TDMS file")
         analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
