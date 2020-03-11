@@ -21,7 +21,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 						median_filter=False, filter_kwargs={},
 						fisheye=False, fisheye_args=[],
 						common_coord=False, ccm_mtx=None,
-						compute=True, smooth_dir_mvmt=True):
+						compute=True, smooth_dir_mvmt=True,
+						interpolate_nans:False):
 	"""
 		Loads, cleans and filters tracking data from dlc.
 		Also handles fisheye correction and registration to common coordinates frame.
@@ -37,6 +38,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 		:param ccm_mtx: np.array with matrix for common coordinates registration
 		:param compute: if true speeds and angles are computed
 		:param smooth_dir_mvmt: if true the direction of mvmt is smoothed with a median filt.
+		:param interpolate_nans: if true it removes nans from the tracking data by linear interpolation
 	"""
 
 	# Load the tracking data
@@ -83,7 +85,6 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 			tracking[bp]['x'] = corrected_xy[:, 0]
 			tracking[bp]['y'] = corrected_xy[:, 1]
 
-
 	# Compute speed, angular velocity etc...
 	if compute:
 		print("     computing speeds and angles")
@@ -102,6 +103,19 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	# Remove low likelihood frames
 	for bp, like in likelihoods.items():
 		tracking[bp][like < likelihood_th] = np.nan
+
+
+	# Remove nans
+	if interpolate_nans:
+		for bp in bodyparts:
+			# Check how many nans
+			number_of_nans = tracking[bp]['x'].isna().sum()
+			if number_of_nans >= len(tracking[bp]/100):
+				print(f'Found > 1% of frames with nan value (i.e. bad tracking) for body part {bp}'+
+						f'[{number_of_nans} frames out of {len(tracking[bp])}]\n'+
+						'Perhaps consider improving tracking quality ?')
+			tracking[bp] = tracking[bp].interpolate(axis=1)
+
 
 	return tracking
 
