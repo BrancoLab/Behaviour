@@ -85,6 +85,19 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 			tracking[bp]['x'] = corrected_xy[:, 0]
 			tracking[bp]['y'] = corrected_xy[:, 1]
 
+	# Remove nans
+	if interpolate_nans:
+		for bp in bodyparts:
+			# Check how many nans
+			track = tracking['bp'].copy()
+			track[like[bp] < likelihood_th] = np.nan
+			number_of_nans = tracking[bp]['x'].isna().sum()
+			if number_of_nans >= len(track/100):
+				print(f'Found > 1% of frames with nan value (i.e. bad tracking) for body part {bp}'+
+						f'[{number_of_nans} frames out of {len(track)}]\n'+
+						'Perhaps consider improving tracking quality ?')
+			tracking[bp] = track.interpolate(axis=1)
+
 	# Compute speed, angular velocity etc...
 	if compute:
 		print("     computing speeds and angles")
@@ -105,16 +118,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 		tracking[bp][like < likelihood_th] = np.nan
 
 
-	# Remove nans
-	if interpolate_nans:
-		for bp in bodyparts:
-			# Check how many nans
-			number_of_nans = tracking[bp]['x'].isna().sum()
-			if number_of_nans >= len(tracking[bp]/100):
-				print(f'Found > 1% of frames with nan value (i.e. bad tracking) for body part {bp}'+
-						f'[{number_of_nans} frames out of {len(tracking[bp])}]\n'+
-						'Perhaps consider improving tracking quality ?')
-			tracking[bp] = tracking[bp].interpolate(axis=1)
+
 
 
 	return tracking
