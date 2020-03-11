@@ -25,7 +25,7 @@ def get_video_params_from_metadata_tdms(metadata, is_opened=False):
     return {n: v for n, v in metadata.object().properties.items()}
 
 
-def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=False, save_df=True):
+def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=False, save_df=True, verbose=False):
     """
         Returns a dataframe with data from mantis analog inputs file, after cleaning 
         up the names of the channels. 
@@ -38,7 +38,13 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     if not is_opened:
         df_path = analog_inputs.split(".")[0]+".h5"
         if check_file_exists(df_path) and not overwrite:
-            return pd.read_hdf(df_path, key='hdf')        
+            try:
+                return pd.read_hdf(df_path, key='hdf')        
+            except:
+                if verbose:
+                    print("Failed to open .h5 file, trying to open as tdms instead")
+        if verbose:
+            print("Opening TDMS file")
         analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
 
     else:
@@ -54,6 +60,8 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     
     if not is_opened and save_df:
         try:
+            if verbose:
+                print("Saving TDMS file as dataframe")
             analog_inputs.to_hdf(df_path, key="hdf")
         except Exception as e:
             print(f"Could not save tdms to .h5 becauseof error: \n{e}")
