@@ -22,7 +22,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 						fisheye=False, fisheye_args=[],
 						common_coord=False, ccm_mtx=None,
 						compute=True, smooth_dir_mvmt=True,
-						interpolate_nans:False):
+						interpolate_nans=False):
 	"""
 		Loads, cleans and filters tracking data from dlc.
 		Also handles fisheye correction and registration to common coordinates frame.
