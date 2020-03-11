@@ -89,7 +89,7 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	if interpolate_nans:
 		for bp in bodyparts:
 			# Check how many nans
-			track = tracking['bp'].copy()
+			track = tracking[bp].copy()
 			track[like[bp] < likelihood_th] = np.nan
 			number_of_nans = tracking[bp]['x'].isna().sum()
 			if number_of_nans >= len(track/100):
