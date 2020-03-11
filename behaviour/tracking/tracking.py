@@ -117,10 +117,6 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	for bp, like in likelihoods.items():
 		tracking[bp][like < likelihood_th] = np.nan
 
-
-
-
-
 	return tracking
 
 
