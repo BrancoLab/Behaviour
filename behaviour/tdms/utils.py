@@ -25,7 +25,8 @@ def get_video_params_from_metadata_tdms(metadata, is_opened=False):
     return {n: v for n, v in metadata.object().properties.items()}
 
 
-def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=False, save_df=True, verbose=False):
+def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=False, save_df=True, verbose=False,
+                try_load_from_h5=True):
     """
         Returns a dataframe with data from mantis analog inputs file, after cleaning 
         up the names of the channels. 
@@ -34,19 +35,20 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
         :param overwrite: bool, if false it avoid overwriting a previously saved dataframe
         :param is_opened: bool, if the path is passed, is_opened should be false so that the tdms file should be opened
         :param save_df: if True it will save the df to file to avoid loading everytime
+        :param try_load_from_h5: if True it will try to load the data from h5 file instead of tdms, 
     """
-    if not is_opened:
-        df_path = analog_inputs.split(".")[0]+".h5"
-        if check_file_exists(df_path) and not overwrite:
-            try:
-                return pd.read_hdf(df_path, key='hdf')        
-            except:
-                if verbose:
-                    print("Failed to open .h5 file, trying to open as tdms instead")
+    if not is_opened or isinstance(analog_inputs, str):
+        if try_load_from_h5:
+            df_path = analog_inputs.split(".")[0]+".h5"
+            if check_file_exists(df_path) and not overwrite:
+                try:
+                    return pd.read_hdf(df_path, key='hdf')        
+                except:
+                    if verbose:
+                        print("Failed to open .h5 file, trying to open as tdms instead")
         if verbose:
             print("Opening TDMS file")
         analog_inputs = open_tdms(analog_inputs, as_dataframe=True)[0]
-
     else:
         if not isinstance(analog_inputs, pd.DataFrame):
             raise ValueError(
@@ -69,16 +71,7 @@ def get_analog_inputs_clean_dataframe(analog_inputs, is_opened=False, overwrite=
     return analog_inputs
 
 
-def get_analog_inputs_clean(analog_inputs, is_opened=False):
-    """
-        Returns a dictionary with data from mantis analog inputs file, after cleaning 
-        up the names of the channels. 
 
-        :param analog_inputs: instance of TdmsFile of path to a tdms analog_inputs file
-        :param is_opened: bool, if the path is passed, is_opened should be false so that the tdms file should be opened
-    """
-    if not is_opened:
-        analog_inputs = open_tdms(analog_inputs)
 
 # ---------------------------------------------------------------------------- #
 #                             GENERAL I/O FUNCTIONS                            #
