@@ -17,12 +17,15 @@ from behaviour.common_coordinates.common_coordinates import register_tracking_da
 
 
 
-def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
+def prepare_tracking_data(tracking_filepath, 
+						likelihood_th=0.999,
 						median_filter=False, filter_kwargs={},
 						fisheye=False, fisheye_args=[],
 						common_coord=False, ccm_mtx=None,
-						compute=True, smooth_dir_mvmt=True,
-						interpolate_nans=False):
+						compute=True, 
+						smooth_dir_mvmt=True,
+						interpolate_nans=False,
+						verbose=False):
 	"""
 		Loads, cleans and filters tracking data from dlc.
 		Also handles fisheye correction and registration to common coordinates frame.
@@ -46,7 +49,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	if '.h5' not in tracking_filepath:
 		raise ValueError("Expected .h5 in the tracking data file path")
 	
-	print('Processing: {}'.format(tracking_filepath))
+	if verbose:
+		print('Processing: {}'.format(tracking_filepath))
 	tracking, bodyparts = clean_dlc_tracking(pd.read_hdf(tracking_filepath))
 
 	# Get likelihood and XY coords
@@ -57,7 +61,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 	# Median filtering
 	if median_filter:
-		print("     applying median filter")
+		if verbose:
+			print("     applying median filter")
 		for bp in bodyparts:
 			tracking[bp]['x'] = median_filter_1d(tracking[bp]['x'].values, **filter_kwargs)
 			tracking[bp]['y'] = median_filter_1d(tracking[bp]['y'].values, **filter_kwargs)
@@ -65,7 +70,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 	# Fisheye correction
 	if fisheye:
 		raise NotImplementedError
-		print("     applying fisheye correction")
+		if verbose:
+			print("     applying fisheye correction")
 		if len(fisheye_args) != 3:
 			raise ValueError("fish eye correction requires 3 arguments \
 						but {} were pased".format(len(fisheye_args)))
@@ -75,7 +81,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 	# Reference frame registration
 	if common_coord:
-		print("     registering to reference space")
+		if verbose:
+			print("     registering to reference space")
 		if ccm_mtx is None:
 			raise ValueError("ccm_mtx cannot be None")
 		 
@@ -100,7 +107,8 @@ def prepare_tracking_data(tracking_filepath, likelihood_th=0.999,
 
 	# Compute speed, angular velocity etc...
 	if compute:
-		print("     computing speeds and angles")
+		if verbose:
+			print("     computing speeds and angles")
 		for bp in bodyparts:
 			x, y = tracking[bp].x.values, tracking[bp].y.values
 
