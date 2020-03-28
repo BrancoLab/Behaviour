@@ -74,5 +74,5 @@ def make_videos_in_parallel(videos, stimuli, **kwargs):
         :param kwargs: other arguments to pass to make_trials_videos
     """
     pool = mp.Pool(mp.cpu_count()-2)
-    pool.map(make_trials_videos, [(vid, ai, **kwargs) for vid, ai in zip(videos, stimuli)])
+    pool.map(make_trials_videos, [(vid, ai, kwargs) for vid, ai in zip(videos, stimuli)])
     pool.close()
