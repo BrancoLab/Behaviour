@@ -27,8 +27,8 @@ def get_times_signal_high_and_low(signal, th=1, min_time_between_highs=None):
 
         :param signal: 1d numpy array or list with time series data
         :param th: float, the time derivative of signal is thresholded to find onset and offset
-        :param min_time_between_highs: int, if a number of passes, onsets that are closer in time
-                than this value are ignored.
+        :param min_time_between_highs: int, min number os samples between peaks. If two peaks 
+            happen within this number of samples, only the first one is used.
     """
     signal_copy = np.zeros_like(signal)
     signal_copy[signal > th] = 1
