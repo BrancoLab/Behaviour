@@ -8,6 +8,7 @@ from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d a
 from fcutils.maths.geometry import calc_angle_between_points_of_vector_2d as get_dir_of_mvmt_from_xy
 from fcutils.maths.geometry import calc_angle_between_vectors_of_points_2d as get_bone_angle
 from fcutils.maths.geometry import calc_ang_velocity
+from fcutils.maths.geometry import calc_distance_between_points_two_vectors_2d as get_bone_length
 from fcutils.maths.utils import derivative
 from fcutils.maths.filtering import median_filter_1d
 
@@ -159,8 +160,14 @@ def compute_body_segments(tracking, segments, smooth_orientation=True):
 		# Get angular velocity
 		bone_angvel = np.array(calc_ang_velocity(bone_orientation))
 
+		# Get bone length
+		bone_length = get_bone_length(np.array([bp1.x.values, bp1.y.values]), np.array([bp2.x.values, bp2.y.values]))
+
+		# Put everything together
+		bone_length = 
 		bones[bone] = pd.DataFrame(dict(
 					orientation = bone_orientation, 
 					angular_velocity = bone_angvel,
+					bone_length = bone_length,
 					))
 	return bones
