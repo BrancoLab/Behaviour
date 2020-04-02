@@ -164,7 +164,6 @@ def compute_body_segments(tracking, segments, smooth_orientation=True):
 		bone_length = get_bone_length(np.array([bp1.x.values, bp1.y.values]).T, np.array([bp2.x.values, bp2.y.values]).T)
 
 		# Put everything together
-		bone_length = 
 		bones[bone] = pd.DataFrame(dict(
 					orientation = bone_orientation, 
 					angular_velocity = bone_angvel,
