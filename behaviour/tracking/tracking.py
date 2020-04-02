@@ -160,8 +160,15 @@ def compute_body_segments(tracking, segments, smooth_orientation=True):
 		# Get angular velocity
 		bone_angvel = np.array(calc_ang_velocity(bone_orientation))
 
-		# Get bone length
-		bone_length = get_bone_length(np.array([bp1.x.values, bp1.y.values]).T, np.array([bp2.x.values, bp2.y.values]).T)
+		# Get bone length [first remove nans to allow computation]
+		bp1_tr, bp2_tr = np.array([bp1.x.values, bp1.y.values]).T, np.array([bp2.x.values, bp2.y.values]).T
+		nan_idxs = list(np.where(np.isnan(bp1_tr[:, 0]))[0]) +
+					list(np.where(np.isnan(bp1_tr[:, 1]))[0]) +
+					list(np.where(np.isnan(bp2_tr[:, 0]))[0]) +
+					list(np.where(np.isnan(bp2_tr[:, 1]))[0])
+
+		bone_length = get_bone_length(np.nan_to_num(bp1_tr), np.nan_to_num(bp1_tr))
+		bone_length[nan_idxs] = np.nan # replace nans
 
 		# Put everything together
 		bones[bone] = pd.DataFrame(dict(
