@@ -1,5 +1,6 @@
 import numpy as np
 import multiprocessing as mp
+import os
 
 from fcutils.file_io.utils import get_file_name
 from fcutils.video.utils import get_cap_from_file, get_cap_selected_frame, get_video_params, open_cvwriter
