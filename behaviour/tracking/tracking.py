@@ -112,21 +112,13 @@ def prepare_tracking_data(tracking_filepath,
 			tracking[bp]['angular_velocity'] = calc_ang_velocity(tracking[bp]['direction_of_movement'].values)
 
 	# Remove nans
-	if interpolate_nans:
-		for bp in bodyparts:
-			# Check how many nans
-			track = tracking[bp].copy()
-			track[likelihoods[bp] < likelihood_th] = np.nan
-			number_of_nans = tracking[bp]['x'].isna().sum()
-			if number_of_nans >= len(track/100):
-				print(f'Found > 1% of frames with nan value (i.e. bad tracking) for body part {bp}'+
-						f'[{number_of_nans} frames out of {len(track)}]\n'+
-						'Perhaps consider improving tracking quality ?')
-			tracking[bp] = track.interpolate(axis=1)
+	for bp, like in likelihoods.items():
+		tracking[bp][like < likelihood_th] = np.nan
+
+		if interpolate_nans:
+			tracking[bp].interpolate(axis=1, inplace=True)
 	else:
-		# Remove low likelihood frames
-		for bp, like in likelihoods.items():
-			tracking[bp][like < likelihood_th] = np.nan
+
 
 	return tracking
 

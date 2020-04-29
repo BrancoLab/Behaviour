@@ -20,7 +20,7 @@ requirements = [
 
 setup(
     name="behaviour",
-    version="0.0.3.5",
+    version="0.0.3.6",
     author_email="federicoclaudi@protonmail.com",
     description="bunch of utility functions to analyse behaviour data",
     packages=find_namespace_packages(exclude=()),
