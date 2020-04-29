@@ -98,7 +98,7 @@ def prepare_tracking_data(tracking_filepath,
 		for bp in bodyparts:
 			# Check how many nans
 			track = tracking[bp].copy()
-			track[like[bp] < likelihood_th] = np.nan
+			track[likelihoods[bp] < likelihood_th] = np.nan
 			number_of_nans = tracking[bp]['x'].isna().sum()
 			if number_of_nans >= len(track/100):
 				print(f'Found > 1% of frames with nan value (i.e. bad tracking) for body part {bp}'+
