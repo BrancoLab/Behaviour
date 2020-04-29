@@ -25,7 +25,7 @@ def prepare_tracking_data(tracking_filepath,
 						common_coord=False, ccm_mtx=None,
 						compute=True, 
 						smooth_dir_mvmt=True,
-						interpolate_nans=False,
+						interpolate_nans=True,
 						verbose=False):
 	"""
 		Loads, cleans and filters tracking data from dlc.
@@ -127,7 +127,7 @@ def prepare_tracking_data(tracking_filepath,
 		# Remove low likelihood frames
 		for bp, like in likelihoods.items():
 			tracking[bp][like < likelihood_th] = np.nan
-			
+
 	return tracking
 
 
