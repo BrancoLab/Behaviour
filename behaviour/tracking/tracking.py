@@ -117,9 +117,6 @@ def prepare_tracking_data(tracking_filepath,
 
 		if interpolate_nans:
 			tracking[bp].interpolate(axis=1, inplace=True)
-	else:
-
-
 	return tracking
 
 
