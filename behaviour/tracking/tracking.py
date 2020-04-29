@@ -105,6 +105,10 @@ def prepare_tracking_data(tracking_filepath,
 						f'[{number_of_nans} frames out of {len(track)}]\n'+
 						'Perhaps consider improving tracking quality ?')
 			tracking[bp] = track.interpolate(axis=1)
+	else:
+		# Remove low likelihood frames
+		for bp, like in likelihoods.items():
+			tracking[bp][like < likelihood_th] = np.nan
 
 	# Compute speed, angular velocity etc...
 	if compute:
@@ -121,10 +125,7 @@ def prepare_tracking_data(tracking_filepath,
 				tracking[bp]['direction_of_movement'] = median_filter_1d(get_dir_of_mvmt_from_xy(x, y), kernel=41)	
 
 			tracking[bp]['angular_velocity'] = calc_ang_velocity(tracking[bp]['direction_of_movement'].values)
-	
-	# Remove low likelihood frames
-	for bp, like in likelihoods.items():
-		tracking[bp][like < likelihood_th] = np.nan
+
 
 	return tracking
 
