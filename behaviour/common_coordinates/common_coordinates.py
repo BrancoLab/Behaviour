@@ -9,7 +9,7 @@ import os
 from fcutils.file_io.utils import check_file_exists, listdir
 
 
-from behaviour.utilities.video import get_background_from_video
+from behaviour.videos.utils import get_background_from_video
 
 
 def register_tracking_data(unregistered, M):
