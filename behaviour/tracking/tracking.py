@@ -116,7 +116,8 @@ def prepare_tracking_data(tracking_filepath,
 		tracking[bp][like < likelihood_th] = np.nan
 
 		if interpolate_nans:
-			tracking[bp].interpolate(axis=1, inplace=True)
+			track = np.float64(tracking[bp].values.copy())
+			tracking[bp] = track.interpolate(axis=0)
 	return tracking
 
 
