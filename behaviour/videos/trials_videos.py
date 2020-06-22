@@ -28,7 +28,7 @@ def make_trials_videos(session_video, stimuli, save_folder=None,
 
     # Open video
     videocap = get_cap_from_file(session_video)
-    nframes, width, height, fps = get_video_params(videocap)
+    nframes, width, height, fps, _ = get_video_params(videocap)
     writer = open_cvwriter(save_path, w=width, h=height, framerate=fps, iscolor=True)
 
     # Prep some vars
@@ -75,6 +75,7 @@ def make_videos_in_parallel(videos, stimuli, **kwargs):
         :param stimuli: list of lists with stimuli onsets for each session
         :param kwargs: other arguments to pass to make_trials_videos
     """
+    raise NotImplementedError('This function has a bug: it needs a better way to pass args to make_trials_videos')
     pool = mp.Pool(mp.cpu_count()-2)
     pool.map(make_trials_videos, [(vid, ai, kwargs) for vid, ai in zip(videos, stimuli)])
     pool.close()
