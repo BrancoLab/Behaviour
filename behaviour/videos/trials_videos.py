@@ -26,7 +26,7 @@ def make_trials_videos(session_video, stimuli, save_folder=None, overwrite=False
     videoname = get_file_name(session_video)
     save_path = os.path.join(save_folder, videoname+'_trials.mp4')
     
-    if overwrite and os.path.isfile(save_path):
+    if not overwrite and os.path.isfile(save_path):
       print(f'Video exists alerady at {save_path}')
       return
 
