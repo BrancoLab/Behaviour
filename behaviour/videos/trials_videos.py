@@ -7,7 +7,7 @@ from fcutils.file_io.utils import get_file_name
 from fcutils.video.utils import get_cap_from_file, get_cap_selected_frame, get_video_params, open_cvwriter
 
 
-def make_trials_videos(session_video, stimuli, save_folder=None, 
+def make_trials_videos(session_video, stimuli, save_folder=None, overwrite=False,
                             n_sec_pre=5, n_sec_pos=15, stim_duration_sec=9):
     """
         Creates a video with the trials for one session. 
@@ -25,6 +25,10 @@ def make_trials_videos(session_video, stimuli, save_folder=None,
         save_folder = os.path.split(session_video)[0]
     videoname = get_file_name(session_video)
     save_path = os.path.join(save_folder, videoname+'_trials.mp4')
+    
+    if overwrite and os.path.isfile(save_path):
+      print(f'Video exists alerady at {save_path}')
+      return
 
     # Open video
     videocap = get_cap_from_file(session_video)
