@@ -8,7 +8,7 @@ from fcutils.maths.geometry import calc_distance_between_points_in_a_vector_2d a
 from fcutils.maths.geometry import calc_angle_between_points_of_vector_2d as get_dir_of_mvmt_from_xy
 from fcutils.maths.geometry import calc_angle_between_vectors_of_points_2d as get_bone_angle
 from fcutils.maths.geometry import calc_ang_velocity
-from fcutils.maths.geometry import calc_distance_between_points_two_vectors_2d as get_bone_length
+from fcutils.maths.geometry import calc_distance_between_points_2d
 from fcutils.maths.utils import derivative
 from fcutils.maths.filtering import median_filter_1d
 
@@ -152,14 +152,18 @@ def compute_body_segments(tracking, segments, smooth_orientation=True):
 		bone_angvel = np.array(calc_ang_velocity(bone_orientation))
 
 		# Get bone length [first remove nans to allow computation]
-		bp1_tr, bp2_tr = np.array([bp1.x.values, bp1.y.values]).T, np.array([bp2.x.values, bp2.y.values]).T
-		nan_idxs = list(np.where(np.isnan(bp1_tr[:, 0]))[0])  + \
-					list(np.where(np.isnan(bp1_tr[:, 1]))[0]) + \
-					list(np.where(np.isnan(bp2_tr[:, 0]))[0]) + \
-					list(np.where(np.isnan(bp2_tr[:, 1]))[0])
+		bp1_tr = np.array([bp1.x.values, bp1.y.values]).T
+		bp2_tr = np.array([bp2.x.values, bp2.y.values]).T
 
-		bone_length = get_bone_length(np.nan_to_num(bp1_tr), np.nan_to_num(bp1_tr))
-		bone_length[nan_idxs] = np.nan # replace nans
+		nan_idxs = (
+		    list(np.where(np.isnan(bp1_tr[:, 0]))[0])
+		    + list(np.where(np.isnan(bp1_tr[:, 1]))[0])
+		    + list(np.where(np.isnan(bp2_tr[:, 0]))[0])
+		    + list(np.where(np.isnan(bp2_tr[:, 1]))[0])
+		)
+
+		bone_length = np.array([calc_distance_between_points_2d(p1, p2) for p1, p2 in zip(np.nan_to_num(bp1_tr), np.nan_to_num(bp2_tr))])
+		bone_length[nan_idxs] = np.nan  # replace nans
 
 		# Put everything together
 		bones[bone] = pd.DataFrame(dict(
